@@ -107,26 +107,29 @@ class Crawler:
         """Worker task that consumes URLs from the queue."""
         while True:
             url = await queue.get()
-            
-            cached_html = self.cache.get_page(url)
-            if cached_html:
-                new_links = await self.process_page(session, url, cached_html)
-            else:
-                _, html = await self.fetch(session, url)
-                if html:
-                    new_links = await self.process_page(session, url, html)
+            try:
+                cached_html = self.cache.get_page(url)
+                if cached_html:
+                    new_links = await self.process_page(session, url, cached_html)
                 else:
-                    new_links = []
-                    
-            for link in new_links:
-                is_new = fetchit_core.add_and_check_url(link) if fetchit_core else self._add_url_python(link)
-                if is_new:
-                    queue.put_nowait(link)
-                    pbar.total += 1
-                    pbar.refresh()
-            
-            pbar.update(1)
-            queue.task_done()
+                    _, html = await self.fetch(session, url)
+                    if html:
+                        new_links = await self.process_page(session, url, html)
+                    else:
+                        new_links = []
+                        
+                for link in new_links:
+                    is_new = fetchit_core.add_and_check_url(link) if fetchit_core else self._add_url_python(link)
+                    if is_new:
+                        queue.put_nowait(link)
+                        pbar.total += 1
+                        pbar.refresh()
+                
+                pbar.update(1)
+            except Exception as e:
+                logging.error(f"Worker {name} failed on {url}: {e}")
+            finally:
+                queue.task_done()
 
     def _add_url_python(self, url: str) -> bool:
         """Fallback deduplication if C++ extension fails."""
@@ -205,7 +208,9 @@ class Crawler:
             self.pages_data.sort(key=lambda x: x[1])
             
             for idx, (title, url, _) in enumerate(self.pages_data, 1):
-                f.write(f"{idx}. [{title}](#{title.lower().replace(' ', '-').replace(/[^\w-]/g, '')})\n")
+                import re
+                anchor = re.sub(r'[^\w-]', '', title.lower().replace(' ', '-'))
+                f.write(f"{idx}. [{title}](#{anchor})\n")
                 
             f.write("\n---\n\n")
             

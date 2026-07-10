@@ -13,9 +13,8 @@ class Extractor:
         self.images_dir = os.path.join(output_dir, "images")
         os.makedirs(self.images_dir, exist_ok=True)
 
-    def extract_main_content(self, html: str) -> Optional[BeautifulSoup]:
+    def extract_main_content(self, soup: BeautifulSoup) -> Optional[BeautifulSoup]:
         """Heuristically extracts the main article content, removing boilerplate."""
-        soup = BeautifulSoup(html, "lxml")
 
         # Try to find the most likely container for the main content
         main_content = (

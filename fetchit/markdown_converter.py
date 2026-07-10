@@ -12,7 +12,7 @@ class FetchItConverter(MarkdownConverter):
         self.options['escape_asterisks'] = False
         self.options['escape_underscores'] = False
 
-    def convert_pre(self, el, text, convert_as_inline):
+    def convert_pre(self, el, text, convert_as_inline, **kwargs):
         """Handle fenced code blocks and attempt basic language detection."""
         if not text:
             return ""
@@ -45,9 +45,9 @@ class FetchItConverter(MarkdownConverter):
 
         return f"\n```{lang}\n{text.strip()}\n```\n"
 
-    def convert_table(self, el, text, convert_as_inline):
+    def convert_table(self, el, text, convert_as_inline, **kwargs):
         """Ensure proper markdown tables."""
-        return super().convert_table(el, text, convert_as_inline)
+        return super().convert_table(el, text, convert_as_inline, **kwargs)
 
 def html_to_markdown(soup: BeautifulSoup, page_title: str, url: str) -> str:
     """Converts a BeautifulSoup object to formatted Markdown."""
