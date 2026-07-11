@@ -47,7 +47,7 @@ class Extractor:
 
         return main_content
 
-    def process_images(self, soup: BeautifulSoup, page_url: str) -> list[str]:
+    def process_images(self, soup: BeautifulSoup, page_url: str, skip_images: bool = False) -> list[str]:
         """Rewrites image src to local paths and returns a list of absolute image URLs to download."""
         image_urls_to_download = []
         for img in soup.find_all("img"):
@@ -57,6 +57,10 @@ class Extractor:
 
             # Resolve absolute URL
             abs_url = urljoin(page_url, src)
+            
+            if skip_images:
+                img["src"] = abs_url
+                continue
             
             # Create a safe local filename based on the URL path
             parsed_url = urlparse(abs_url)

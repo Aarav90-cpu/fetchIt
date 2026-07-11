@@ -23,11 +23,12 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 class Crawler:
     """Asynchronous web crawler that fetches, extracts, and converts pages to Markdown."""
 
-    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3):
+    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3, skip_images: bool = False):
         self.base_url = base_url
         self.output_file = output_file
         self.max_concurrency = max_concurrency
         self.retries = retries
+        self.skip_images = skip_images
         
         self.parsed_base = urlparse(base_url)
         self.cache = Cache()
@@ -44,11 +45,16 @@ class Crawler:
                     if response.status == 200:
                         content = await response.text()
                         return url, content
+                    elif response.status in (401, 403, 404):
+                        logging.warning(f"Failed to fetch {url}, status: {response.status}")
+                        return url, ""
                     else:
                         logging.warning(f"Failed to fetch {url}, status: {response.status}")
+                        response.raise_for_status()
             except Exception as e:
                 logging.debug(f"Attempt {attempt+1} failed for {url}: {e}")
-                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                if attempt < self.retries - 1:
+                    await asyncio.sleep(min(2 ** attempt, 10))  # Exponential backoff capped at 10s
         return url, ""
 
     async def download_image(self, session: aiohttp.ClientSession, img_url: str, local_path: str):
@@ -64,8 +70,13 @@ class Crawler:
                         with open(local_path, 'wb') as f:
                             f.write(content)
                         return
+                    elif response.status in (401, 403, 404):
+                        return
+                    else:
+                        response.raise_for_status()
             except Exception:
-                await asyncio.sleep(2 ** attempt)
+                if attempt < self.retries - 1:
+                    await asyncio.sleep(min(2 ** attempt, 10))
 
     async def process_page(self, session: aiohttp.ClientSession, url: str, html: str) -> List[str]:
         """Extracts content, converts to markdown, and finds new links."""
@@ -89,7 +100,7 @@ class Crawler:
             return new_links
 
         # 3. Process images
-        image_tasks = self.extractor.process_images(main_content, url)
+        image_tasks = self.extractor.process_images(main_content, url, self.skip_images)
         for img_url, local_path in image_tasks:
             await self.download_image(session, img_url, local_path)
 

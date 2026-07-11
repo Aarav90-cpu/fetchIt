@@ -33,6 +33,7 @@ def main():
     parser.add_argument("-o", "--output", default="output.md", help="Output markdown file name")
     parser.add_argument("-c", "--concurrency", type=int, default=10, help="Maximum concurrent requests")
     parser.add_argument("-r", "--retries", type=int, default=3, help="Number of retries for failed requests")
+    parser.add_argument("--no-images", action="store_true", help="Skip downloading images and link them directly")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}", help="Print version information")
 
@@ -57,7 +58,8 @@ def main():
         base_url=args.url,
         output_file=args.output,
         max_concurrency=args.concurrency,
-        retries=args.retries
+        retries=args.retries,
+        skip_images=args.no_images
     )
 
     try:
