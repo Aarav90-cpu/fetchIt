@@ -19,6 +19,11 @@ clean:
 
 install: $(TARGET)
 	@echo "Installing FetchIt system-wide..."
-	python3 -m pip install .
+	@if command -v pacman > /dev/null; then \
+		echo "Arch Linux detected. Installing dependencies via pacman..."; \
+		pacman -S --noconfirm --needed pybind11 python-aiohttp python-beautifulsoup4 python-markdownify python-tqdm python-lxml; \
+		pip3 install --no-deps --break-system-packages .; \
+	else \
+		pip3 install .; \
+	fi
 	@echo "Installation complete!"
-
