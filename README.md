@@ -72,8 +72,11 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 | `-c`, `--concurrency` | Maximum pages to download at once | `10` |
 | `-r`, `--retries` | Number of retries for failed downloads | `3` |
 | `--no-images` | Skip downloading images and use remote URLs | Disabled |
+| `--tree` | Save output as a directory tree of markdown files | Disabled |
 | `--verbose` | Print detailed debug logs | Disabled |
 | `-v`, `--version` | Print the current version | Disabled |
+
+> **Note on `--no-images`**: This flag skips downloading image files to your local disk, but the images are still embedded in the Markdown using their original absolute web URLs (e.g., `![image](https://reddit.com/...)`). This means the images will still load and display when you view the Markdown online or in an editor, as long as you have an active internet connection!
 
 ### Example
 
@@ -83,8 +86,26 @@ fetchit https://developer.android.com/compose -o compose.md -c 20
 
 - Crawls the Android Compose documentation.
 - Downloads 20 pages at a time.
-- Saves output to `compose.md`.
+- Saves output to a single file `compose.md`.
 - Saves images in the `images/` directory.
+
+### Directory Tree Example
+
+You can save the documentation as a file tree instead of a single markdown file:
+
+```bash
+fetchit https://developer.android.com/compose -o docs --tree
+```
+
+This will create a `docs/` folder containing the file structure:
+```
+docs/
+ |- compose/
+ |   |- index.md
+ |   |- setup.md
+ |   |- ui/
+ |       |- button.md
+```
 
 ## Architecture
 

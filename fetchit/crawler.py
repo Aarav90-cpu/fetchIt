@@ -18,17 +18,16 @@ from .cache import Cache
 from .extractor import Extractor
 from .markdown_converter import html_to_markdown
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-
 class Crawler:
     """Asynchronous web crawler that fetches, extracts, and converts pages to Markdown."""
 
-    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3, skip_images: bool = False):
+    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3, skip_images: bool = False, tree_output: bool = False):
         self.base_url = base_url
         self.output_file = output_file
         self.max_concurrency = max_concurrency
         self.retries = retries
         self.skip_images = skip_images
+        self.tree_output = tree_output
         
         self.parsed_base = urlparse(base_url)
         self.cache = Cache()
@@ -207,7 +206,10 @@ class Crawler:
                 for w in workers:
                     w.cancel()
 
-        self._generate_output()
+        if self.tree_output:
+            self._generate_tree_output()
+        else:
+            self._generate_output()
 
     def _generate_output(self):
         """Generates the final concatenated markdown file with TOC."""
@@ -230,3 +232,35 @@ class Crawler:
                 f.write("\n")
                 
         logging.info(f"Successfully wrote documentation to {self.output_file}")
+
+    def _generate_tree_output(self):
+        """Generates a directory tree of markdown files representing the site structure."""
+        # Determine the root directory name
+        output_dir = self.output_file
+        if output_dir == "output.md":
+            output_dir = self.parsed_base.netloc
+        elif output_dir.endswith('.md'):
+            output_dir = output_dir[:-3]
+            
+        logging.info(f"Generating markdown file tree in '{output_dir}/' ...")
+        
+        for title, url, md_content in self.pages_data:
+            parsed = urlparse(url)
+            path = parsed.path.strip('/')
+            
+            if not path:
+                # Root of the domain
+                filepath = os.path.join(output_dir, "index.md")
+            else:
+                if url.endswith('/'):
+                    filepath = os.path.join(output_dir, path, "index.md")
+                else:
+                    filepath = os.path.join(output_dir, path + ".md")
+                    
+            # Ensure the directory exists
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(md_content)
+                
+        logging.info(f"Successfully wrote file tree to {output_dir}/")

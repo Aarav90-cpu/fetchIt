@@ -91,7 +91,7 @@ class BuildExt(build_ext):
 
 setup(
     name='fetchit',
-    version='0.0.2',
+    version='0.0.4',
     author='FetchIt',
     description='A highly concurrent web crawler and markdown extractor',
     long_description='',
