@@ -71,6 +71,7 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 | `-o`, `--output` | Output file name | `output.md` |
 | `-c`, `--concurrency` | Maximum pages to download at once | `10` |
 | `-r`, `--retries` | Number of retries for failed downloads | `3` |
+| `--no-images` | Skip downloading images and use remote URLs | Disabled |
 | `--verbose` | Print detailed debug logs | Disabled |
 | `-v`, `--version` | Print the current version | Disabled |
 
