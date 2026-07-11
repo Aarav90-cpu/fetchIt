@@ -3,7 +3,14 @@ import asyncio
 import logging
 import subprocess
 import os
+import sys
+from importlib.metadata import version, PackageNotFoundError
 from .crawler import Crawler
+
+try:
+    __version__ = version("fetchit")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 def start_background_compilation():
     """Starts the C++ compilation in the background."""
@@ -22,13 +29,22 @@ def main():
     start_background_compilation()
     
     parser = argparse.ArgumentParser(description="Fetch It! - A highly concurrent web crawler and markdown extractor.")
-    parser.add_argument("url", help="The base URL to crawl (e.g. https://developer.android.com/compose)")
+    parser.add_argument("url", nargs="?", help="The base URL to crawl (e.g. https://developer.android.com/compose)")
     parser.add_argument("-o", "--output", default="output.md", help="Output markdown file name")
     parser.add_argument("-c", "--concurrency", type=int, default=10, help="Maximum concurrent requests")
     parser.add_argument("-r", "--retries", type=int, default=3, help="Number of retries for failed requests")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
+    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}", help="Print version information")
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     args = parser.parse_args()
+
+    if not args.url:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
