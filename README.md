@@ -1,20 +1,18 @@
 # FetchIt
 
-FetchIt is a tool to download web documentation and convert it into a single clean Markdown file.
+FetchIt downloads web documentation and converts it to a single Markdown file.
 
 ## Features
 
-- **Concurrent Crawling**: Downloads many pages at the same time.
-- **Smart Extraction**: Removes headers, footers, sidebars, and menus.
-- **Markdown Conversion**: Converts HTML into standard Markdown formats.
-- **Image Downloading**: Saves images locally and updates links.
-- **Auto Language Detection**: Detects code languages like Python, Java, and Bash.
-- **Cache and Resume**: Saves progress using SQLite so it can resume after stopping.
-- **Fast Parsing**: Uses a C++ module in the background for fast XML parsing and URL checking.
+- Downloads multiple pages at the same time.
+- Removes headers, footers, sidebars, and menus.
+- Converts HTML to standard Markdown.
+- Saves images locally and updates links.
+- Detects programming languages automatically.
+- Saves progress to resume later.
+- Uses C++ for fast parsing.
 
 ## Installation
-
-Follow these steps to set up the project on your machine.
 
 ### Prerequisites
 
@@ -22,11 +20,31 @@ Follow these steps to set up the project on your machine.
 - C++ compiler (like GCC or Clang)
 - `make` utility
 
-### Setup Instructions
+### Arch Linux
 
-1. Clone the repository or navigate to the folder.
-2. Create and activate a Python virtual environment.
-3. Install the dependencies.
+Install using `yay` from the AUR:
+
+```bash
+yay -S fetchit-git
+```
+
+### System-Wide Installation (Other Systems)
+
+Use `make` to install system-wide.
+
+```bash
+sudo make install
+```
+
+To remove the program later:
+
+```bash
+sudo make uninstall
+```
+
+### Local Virtual Environment
+
+Use a virtual environment to avoid system conflicts.
 
 ```bash
 python3 -m venv .venv
@@ -34,30 +52,27 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-- `python3 -m venv .venv` creates an isolated Python space.
-- `source .venv/bin/activate` activates the isolated Python space.
-- `pip install -e .` installs FetchIt and all required packages from `setup.py`.
-
 ## Usage
 
-Run the tool using the command line interface (CLI).
+Run the tool from the command line.
 
 ```bash
 fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 ```
 
-- `fetchit` is the main command to start the crawler.
-- The C++ extension will automatically compile in the background when you run this command.
+- Run `fetchit` without arguments to see the help menu.
+- The C++ extension compiles automatically on the first run.
 
-### Available Commands and Options
+### Options
 
-| Command/Option | Description | Default Value |
+| Option | Description | Default |
 | --- | --- | --- |
-| `URL` | The starting website address to crawl | (Required) |
-| `-o`, `--output` | The name of the final Markdown file | `output.md` |
-| `-c`, `--concurrency` | Maximum number of pages to download at once | `10` |
-| `-r`, `--retries` | Number of times to retry a failed download | `3` |
-| `-v`, `--verbose` | Print detailed logs for debugging | Disabled |
+| `URL` | Starting website address | Required |
+| `-o`, `--output` | Output file name | `output.md` |
+| `-c`, `--concurrency` | Maximum pages to download at once | `10` |
+| `-r`, `--retries` | Number of retries for failed downloads | `3` |
+| `--verbose` | Print detailed debug logs | Disabled |
+| `-v`, `--version` | Print the current version | Disabled |
 
 ### Example
 
@@ -65,15 +80,13 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 fetchit https://developer.android.com/compose -o compose.md -c 20
 ```
 
-- This command will start crawling the given Android Compose URL.
-- It will download up to 20 pages at the same time.
-- It will save the final result in a file named `compose.md`.
-- All images will be saved in a folder named `images/` in your current directory.
+- Crawls the Android Compose documentation.
+- Downloads 20 pages at a time.
+- Saves output to `compose.md`.
+- Saves images in the `images/` directory.
 
 ## Architecture
 
-The project is split into three main parts.
-
-- **C++ Extension**: Handles fast sitemap parsing and checking for duplicate URLs.
-- **Python Crawler**: Manages network requests, retries, and caching.
-- **Python Extractor**: Analyzes the HTML, cleans it, and converts it to Markdown.
+- **C++ Extension**: Parses sitemaps and checks URLs quickly.
+- **Python Crawler**: Manages network requests and retries.
+- **Python Extractor**: Cleans HTML and converts it to Markdown.

@@ -45,3 +45,6 @@ images/
 .vscode/
 *.swp
 .DS_Store
+
+# AUR
+fetchit-aur/

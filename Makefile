@@ -27,3 +27,12 @@ install: $(TARGET)
 		pip3 install .; \
 	fi
 	@echo "Installation complete!"
+
+uninstall:
+	@echo "Uninstalling FetchIt..."
+	@if command -v pacman > /dev/null; then \
+		pip3 uninstall --break-system-packages -y fetchit; \
+	else \
+		pip3 uninstall -y fetchit; \
+	fi
+	@echo "Uninstallation complete!"
