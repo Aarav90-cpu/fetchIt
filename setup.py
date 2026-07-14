@@ -90,20 +90,9 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='fetchit',
-    version='0.0.4',
-    author='FetchIt',
-    description='A highly concurrent web crawler and markdown extractor',
-    long_description='',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.4', 'aiohttp', 'beautifulsoup4', 'markdownify', 'tqdm', 'lxml'],
     setup_requires=['pybind11>=2.4'],
     cmdclass={'build_ext': BuildExt},
     packages=['fetchit'],
     zip_safe=False,
-    entry_points={
-        'console_scripts': [
-            'fetchit=fetchit.cli:main',
-        ],
-    },
 )

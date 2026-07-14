@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "pybind11>=2.4"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fetchit"
+version = "0.0.4"
+description = "A highly concurrent web crawler and markdown extractor"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+authors = [
+  { name = "Aarav Ravindra Kharade" }
+]
+maintainers = [
+  { name = "Aarav Ravindra Kharade" }
+]
+keywords = [
+  "crawler", "scraper", "markdown", "documentation",
+  "web", "spider", "html-to-markdown", "async", "c++", "fetch"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: C++",
+  "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+  "Topic :: Text Processing :: Markup :: Markdown"
+]
+dependencies = [
+  "aiohttp>=3.8.0",
+  "beautifulsoup4>=4.11.0",
+  "markdownify>=0.11.0",
+  "tqdm>=4.64.0",
+  "lxml>=4.9.0"
+]
+
+[project.scripts]
+fetchit = "fetchit.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Aarav90-cpu/fetchIt"
+Repository = "https://github.com/Aarav90-cpu/fetchIt.git"
+"Bug Tracker" = "https://github.com/Aarav90-cpu/fetchIt/issues"
