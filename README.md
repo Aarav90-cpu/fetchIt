@@ -33,7 +33,7 @@ pip install fetchit-md
 Install using `yay` from the AUR:
 
 ```bash
-yay -S fetchit-git
+yay -S fetchit-aur
 ```
 
 ### System-Wide Installation (Other Systems)
