@@ -20,6 +20,14 @@ FetchIt downloads web documentation and converts it to a single Markdown file.
 - C++ compiler (like GCC or Clang)
 - `make` utility
 
+### PyPI (Recommended)
+
+Install the latest version directly from PyPI:
+
+```bash
+pip install fetchit-md
+```
+
 ### Arch Linux
 
 Install using `yay` from the AUR:
