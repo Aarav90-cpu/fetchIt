@@ -11,7 +11,9 @@ class Extractor:
         """Initialize with base URL to resolve relative links."""
         self.base_url = base_url
         self.images_dir = os.path.join(output_dir, "images")
+        self.assets_dir = os.path.join(output_dir, "assets")
         os.makedirs(self.images_dir, exist_ok=True)
+        os.makedirs(self.assets_dir, exist_ok=True)
 
     def extract_main_content(self, soup: BeautifulSoup) -> Optional[BeautifulSoup]:
         """Heuristically extracts the main article content, removing boilerplate."""
@@ -47,9 +49,9 @@ class Extractor:
 
         return main_content
 
-    def process_images(self, soup: BeautifulSoup, page_url: str, skip_images: bool = False) -> list[str]:
-        """Rewrites image src to local paths and returns a list of absolute image URLs to download."""
-        image_urls_to_download = []
+    def process_assets(self, soup: BeautifulSoup, page_url: str, skip_images: bool = False, fetch_css_js: bool = False) -> list[tuple[str, str]]:
+        """Rewrites image/css/js src/href to local paths and returns a list of absolute URLs to download."""
+        assets_to_download = []
         for img in soup.find_all("img"):
             src = img.get("src")
             if not src:
@@ -76,6 +78,33 @@ class Extractor:
             img["src"] = local_path
             
             # Save for downloading
-            image_urls_to_download.append((abs_url, os.path.join(self.images_dir, safe_filename)))
+            assets_to_download.append((abs_url, os.path.join(self.images_dir, safe_filename)))
 
-        return image_urls_to_download
+        if fetch_css_js:
+            # CSS
+            for link in soup.find_all("link", rel="stylesheet"):
+                href = link.get("href")
+                if not href:
+                    continue
+                abs_url = urljoin(page_url, href)
+                parsed_url = urlparse(abs_url)
+                filename = os.path.basename(parsed_url.path) or "style.css"
+                safe_filename = f"{hash(abs_url) % 100000}_{filename}"
+                local_path = os.path.join("assets", safe_filename)
+                link["href"] = local_path
+                assets_to_download.append((abs_url, os.path.join(self.assets_dir, safe_filename)))
+                
+            # JS
+            for script in soup.find_all("script"):
+                src = script.get("src")
+                if not src:
+                    continue
+                abs_url = urljoin(page_url, src)
+                parsed_url = urlparse(abs_url)
+                filename = os.path.basename(parsed_url.path) or "script.js"
+                safe_filename = f"{hash(abs_url) % 100000}_{filename}"
+                local_path = os.path.join("assets", safe_filename)
+                script["src"] = local_path
+                assets_to_download.append((abs_url, os.path.join(self.assets_dir, safe_filename)))
+
+        return assets_to_download

@@ -21,13 +21,14 @@ from .markdown_converter import html_to_markdown
 class Crawler:
     """Asynchronous web crawler that fetches, extracts, and converts pages to Markdown."""
 
-    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3, skip_images: bool = False, tree_output: bool = False):
+    def __init__(self, base_url: str, output_file: str, max_concurrency: int = 10, retries: int = 3, skip_images: bool = False, tree_output: bool = False, html_mode: bool = False):
         self.base_url = base_url
         self.output_file = output_file
         self.max_concurrency = max_concurrency
         self.retries = retries
         self.skip_images = skip_images
         self.tree_output = tree_output
+        self.html_mode = html_mode
         
         self.parsed_base = urlparse(base_url)
         self.cache = Cache()
@@ -56,8 +57,8 @@ class Crawler:
                     await asyncio.sleep(min(2 ** attempt, 10))  # Exponential backoff capped at 10s
         return url, ""
 
-    async def download_image(self, session: aiohttp.ClientSession, img_url: str, local_path: str):
-        """Downloads an image and saves it to the local filesystem."""
+    async def download_asset(self, session: aiohttp.ClientSession, asset_url: str, local_path: str):
+        """Downloads an asset (image, css, js) and saves it to the local filesystem."""
         if os.path.exists(local_path):
             return # Already downloaded
             
@@ -94,21 +95,28 @@ class Crawler:
                 new_links.append(full_url)
                 
         # 2. Extract main content
-        main_content = self.extractor.extract_main_content(soup)
-        if not main_content:
-            return new_links
+        if not self.html_mode:
+            main_content = self.extractor.extract_main_content(soup)
+            if not main_content:
+                return new_links
+        else:
+            main_content = soup
 
-        # 3. Process images
-        image_tasks = self.extractor.process_images(main_content, url, self.skip_images)
-        for img_url, local_path in image_tasks:
-            await self.download_image(session, img_url, local_path)
+        # 3. Process images and assets
+        asset_tasks = self.extractor.process_assets(main_content, url, self.skip_images, fetch_css_js=self.html_mode)
+        for asset_url, local_path in asset_tasks:
+            await self.download_asset(session, asset_url, local_path)
 
-        # 4. Convert to markdown
+        # 4. Convert to markdown or keep HTML
         title = soup.title.string if soup.title else "Untitled Page"
-        title = title.strip()
-        markdown_content = html_to_markdown(main_content, title, url)
+        title = title.strip() if title else ""
         
-        self.pages_data.append((title, url, markdown_content))
+        if self.html_mode:
+            content_to_save = str(main_content)
+        else:
+            content_to_save = html_to_markdown(main_content, title, url)
+        
+        self.pages_data.append((title, url, content_to_save))
         self.cache.save_page(url, html)
         
         return new_links
@@ -206,7 +214,9 @@ class Crawler:
                 for w in workers:
                     w.cancel()
 
-        if self.tree_output:
+        if self.html_mode:
+            self._generate_html_tree_output()
+        elif self.tree_output:
             self._generate_tree_output()
         else:
             self._generate_output()
@@ -264,3 +274,56 @@ class Crawler:
                 f.write(md_content)
                 
         logging.info(f"Successfully wrote file tree to {output_dir}/")
+
+    def _generate_html_tree_output(self):
+        """Generates a directory tree of HTML files representing the site structure."""
+        # Determine the root directory name
+        output_dir = self.output_file
+        if output_dir == "output.md":
+            output_dir = self.parsed_base.netloc
+        elif output_dir.endswith('.md') or output_dir.endswith('.html'):
+            output_dir = output_dir[:output_dir.rfind('.')]
+            
+        logging.info(f"Generating HTML file tree in '{output_dir}/' ...")
+        
+        # Build mapping of URL to local filepath for internal link rewriting
+        url_to_filepath = {}
+        for title, url, _ in self.pages_data:
+            parsed = urlparse(url)
+            path = parsed.path.strip('/')
+            
+            if not path:
+                filepath = "index.html"
+            else:
+                if url.endswith('/'):
+                    filepath = os.path.join(path, "index.html")
+                else:
+                    filepath = path + ".html"
+            url_to_filepath[url] = filepath
+
+        for title, url, html_content in self.pages_data:
+            my_filepath = url_to_filepath[url]
+            full_filepath = os.path.join(output_dir, my_filepath)
+            
+            # Rewrite internal links
+            soup = BeautifulSoup(html_content, "lxml")
+            for a_tag in soup.find_all("a", href=True):
+                href = a_tag["href"]
+                full_url = urljoin(url, href)
+                full_url_no_frag = full_url.split('#')[0]
+                frag = '#' + full_url.split('#')[1] if '#' in full_url else ''
+                
+                if full_url_no_frag in url_to_filepath:
+                    target_filepath = url_to_filepath[full_url_no_frag]
+                    # Compute relative path from my_filepath to target_filepath
+                    my_dir = os.path.dirname(my_filepath)
+                    rel_path = os.path.relpath(target_filepath, my_dir) if my_dir else target_filepath
+                    a_tag["href"] = rel_path + frag
+            
+            # Ensure the directory exists
+            os.makedirs(os.path.dirname(full_filepath), exist_ok=True)
+            
+            with open(full_filepath, 'w', encoding='utf-8') as f:
+                f.write(str(soup))
+                
+        logging.info(f"Successfully wrote HTML file tree to {output_dir}/")

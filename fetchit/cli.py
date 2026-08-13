@@ -62,6 +62,7 @@ def main():
     parser.add_argument("-r", "--retries", type=int, default=3, help="Number of retries for failed requests")
     parser.add_argument("--no-images", action="store_true", help="Skip downloading images and link them directly")
     parser.add_argument("--tree", action="store_true", help="Save output as a directory tree of markdown files instead of a single file")
+    parser.add_argument("--html", action="store_true", help="Fetch raw HTML files with CSS/JS instead of Markdown")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
     parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}", help="Print version information")
 
@@ -77,6 +78,10 @@ def main():
 
     setup_logging(args.verbose)
 
+    if args.html and args.tree:
+        logging.warning("Warning: --tree command does not work with --html. The --tree option will be disabled (HTML mode implicitly uses a directory structure).")
+        args.tree = False
+
     logging.info(f"Starting Fetch It! on {args.url}")
     logging.info(f"Output will be written to {args.output}")
     logging.info(f"Concurrency: {args.concurrency}, Retries: {args.retries}")
@@ -87,7 +92,8 @@ def main():
         max_concurrency=args.concurrency,
         retries=args.retries,
         skip_images=args.no_images,
-        tree_output=args.tree
+        tree_output=args.tree,
+        html_mode=args.html
     )
 
     try:

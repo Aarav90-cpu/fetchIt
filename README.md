@@ -81,6 +81,7 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 | `-r`, `--retries` | Number of retries for failed downloads | `3` |
 | `--no-images` | Skip downloading images and use remote URLs | Disabled |
 | `--tree` | Save output as a directory tree of markdown files | Disabled |
+| `--html` | Save output as raw HTML instead of Markdown (forces `--tree` and skips cleaning) | Disabled |
 | `--verbose` | Print detailed debug logs | Disabled |
 | `-v`, `--version` | Print the current version | Disabled |
 
