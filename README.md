@@ -1,24 +1,25 @@
 # FetchIt
 
-FetchIt downloads web documentation and converts it to a single Markdown file.
+FetchIt downloads web documentation and converts it to Markdown. It works with or without a sitemap -- if no sitemap is found, it discovers pages by following links automatically.
 
 ## Features
 
 - Downloads multiple pages at the same time.
+- Discovers pages automatically even without a sitemap.
+- Respects `robots.txt` rules.
 - Removes headers, footers, sidebars, and menus.
 - Converts HTML to standard Markdown.
 - Saves images locally and updates links.
+- Fetches raw HTML with CSS/JS assets (`--html` mode).
 - Detects programming languages automatically.
 - Saves progress to resume later.
-- Uses C++ for fast parsing.
+- Controls crawl depth with `--depth`.
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.8 or newer
-- C++ compiler (like GCC or Clang)
-- `make` utility
+- Python 3.10 or newer
 
 ### PyPI (Recommended)
 
@@ -69,7 +70,6 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 ```
 
 - Run `fetchit` without arguments to see the help menu.
-- The C++ extension compiles automatically on the first run.
 
 ### Options
 
@@ -79,9 +79,11 @@ fetchit <URL> -o <OUTPUT_FILE> -c <CONCURRENCY> -r <RETRIES>
 | `-o`, `--output` | Output file name | `output.md` |
 | `-c`, `--concurrency` | Maximum pages to download at once | `10` |
 | `-r`, `--retries` | Number of retries for failed downloads | `3` |
+| `-d`, `--depth` | Maximum crawl depth from the starting URL | Unlimited (sitemap) / 100 (no sitemap) |
 | `--no-images` | Skip downloading images and use remote URLs | Disabled |
 | `--tree` | Save output as a directory tree of markdown files | Disabled |
-| `--html` | Save output as raw HTML instead of Markdown (forces `--tree` and skips cleaning) | Disabled |
+| `--html` | Fetch raw HTML with CSS/JS instead of Markdown (skips cleaning, saves as directory tree) | Disabled |
+| `--render` | Render JavaScript with a headless browser before extracting content | Disabled |
 | `--verbose` | Print detailed debug logs | Disabled |
 | `-v`, `--version` | Print the current version | Disabled |
 
@@ -116,8 +118,33 @@ docs/
  |       |- button.md
 ```
 
+### Crawling Without a Sitemap
+
+Some sites do not have a `sitemap.xml`. FetchIt handles this automatically by following links found on each page:
+
+```bash
+fetchit https://example.com -o example --tree --depth 3
+```
+
+- Starts from the given URL and follows links up to 3 levels deep.
+- If no `--depth` is specified and no sitemap is found, the default depth is 100.
+
+### Single Page Applications (SPAs) & Dynamic Websites
+
+FetchIt includes built-in dynamic data discovery for JavaScript-heavy sites and Single Page Applications:
+- Automatically detects `.json` data files (like `annotations.json` or `data.json`) and API calls in client-side scripts.
+- In `--html` mode, downloads these data files locally so client-side applications continue to function offline.
+- In Markdown mode, if an SPA returns an empty HTML container, FetchIt extracts the structured data from the discovered JSON files and generates formatted Markdown.
+- Use `--render` to execute JavaScript via a headless browser for sites requiring dynamic client-side DOM rendering:
+
+```bash
+fetchit https://example.com/app -o app.md --render
+```
+
 ## Architecture
 
-- **C++ Extension**: Parses sitemaps and checks URLs quickly.
-- **Python Crawler**: Manages network requests and retries.
+- **Python Crawler**: Manages concurrent network requests, retries, and depth tracking.
 - **Python Extractor**: Cleans HTML and converts it to Markdown.
+- **URL Manager**: Deduplicates visited URLs.
+- **Sitemap Parser**: Extracts URLs from sitemap XML files.
+- **Robots Parser**: Respects `robots.txt` Disallow/Allow rules.

@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "pybind11>=2.4"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "fetchit-md"
-version = "0.0.5"
+version = "0.0.6"
 description = "A highly concurrent web crawler and markdown extractor"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
   { name = "Aarav Ravindra Kharade" }
@@ -17,7 +17,7 @@ maintainers = [
 ]
 keywords = [
   "crawler", "scraper", "markdown", "documentation",
-  "web", "spider", "html-to-markdown", "async", "c++", "fetch"
+  "web", "spider", "html-to-markdown", "async", "fetch"
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -25,12 +25,11 @@ classifiers = [
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: C++",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
   "Topic :: Text Processing :: Markup :: Markdown"
 ]
