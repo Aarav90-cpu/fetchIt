@@ -26,3 +26,4 @@ FetchIt is a command-line tool and asynchronous web crawler designed to download
 - [Single Page Applications & Dynamic Sites](spa-and-dynamic-sites.md): Handling JavaScript-heavy websites via pure Python data scraping and Playwright headless rendering.
 - [Output Modes](output-modes.md): Comparison and usage of Single File Markdown, Directory Tree Markdown, and Offline HTML modes.
 - [Installation Guide](installation.md): Installation options via PyPI, AUR, Makefile, and source development.
+

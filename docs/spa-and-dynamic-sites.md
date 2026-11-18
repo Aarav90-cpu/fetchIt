@@ -73,3 +73,4 @@ fetchit https://example.com/app -o app.md --render
 | Execution Speed | Fast (network I/O bound) | Moderate (browser startup & DOM execution) |
 | Resource Usage | Low memory footprint | Higher memory footprint for Chromium processes |
 | Best For | Standard SPAs with JSON data APIs | JavaScript-heavy pages requiring full DOM evaluation |
+

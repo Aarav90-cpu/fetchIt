@@ -109,3 +109,4 @@ fetchit https://example.com/docs -o site_backup --html
 | Assets Localized | Images | Images | Images, CSS, JS, Fonts, JSON |
 | Offline Browsable | In Markdown readers | In Markdown readers | In any standard web browser |
 | Best For | LLM context, search, printing | Documentation wikis, Git repos | Complete offline archives |
+

@@ -2,4 +2,4 @@
 FetchIt - A highly concurrent web crawler and markdown extractor.
 """
 
-__version__ = "0.0.6"
+__version__ = "0.0.5"

@@ -74,7 +74,7 @@ If run without arguments, FetchIt displays the standard help menu and exits.
 
 ### `-v`, `--version`
 - **Type**: Flag
-- **Description**: Prints the installed FetchIt version (e.g., `fetchit 0.0.6`) and exits.
+- **Description**: Prints the installed FetchIt version (e.g., `fetchit 0.0.5`) and exits.
 
 ---
 
@@ -88,3 +88,4 @@ If run without arguments, FetchIt displays the standard help menu and exits.
 | Full offline browsable website | `fetchit https://example.com -o offline_site --html` |
 | Single Page Application with dynamic JS | `fetchit https://example.com/spa -o spa.md --render` |
 | Fast crawl skipping local image downloads | `fetchit https://example.com -o fast.md --no-images` |
+

@@ -133,3 +133,4 @@ Persistent local SQLite storage for crawl state.
   - **`save_page(url, content, status)`**: Uses `REPLACE INTO` to persist page content and HTTP status.
   - **`is_visited(url)`**: Quick boolean existence check.
   - Allows interrupted crawls to resume immediately without re-fetching existing network resources.
+

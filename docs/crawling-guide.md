@@ -82,3 +82,4 @@ FetchIt automatically fetches and parses `https://<domain>/robots.txt` before be
   - If a path matches an `Allow:` rule, crawling is permitted.
   - If a path matches a `Disallow:` rule and no higher-priority allow rule, the URL is skipped.
 - Explicit `Sitemap:` declarations in `robots.txt` are automatically added to the candidate sitemap list.
+
