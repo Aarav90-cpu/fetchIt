@@ -74,7 +74,7 @@ If run without arguments, FetchIt displays the standard help menu and exits.
 
 ### `-v`, `--version`
 - **Type**: Flag
-- **Description**: Prints the installed FetchIt version (e.g., `fetchit 0.0.5`) and exits.
+- **Description**: Prints the installed FetchIt version (e.g., `fetchit 0.0.6`) and exits.
 
 ---
 

@@ -18,7 +18,7 @@ from .sitemap_parser import extract_urls_from_sitemap
 # Realistic modern browser user agent to prevent 403 blocks from Cloudflare/WAFs
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 FetchIt/0.0.5"
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 FetchIt/0.0.6"
 )
 
 # Common sitemap and feed discovery paths
