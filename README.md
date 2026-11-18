@@ -141,6 +141,17 @@ FetchIt includes built-in dynamic data discovery for JavaScript-heavy sites and 
 fetchit https://example.com/app -o app.md --render
 ```
 
+## Documentation
+
+Comprehensive guides and architectural breakdowns are available in the [docs/](docs/index.md) directory:
+
+- [Architecture & Module Breakdown](docs/architecture.md): Deep-dive into internal classes, methods, and algorithms.
+- [CLI Reference](docs/cli-reference.md): Detailed option flags, defaults, and option interactions.
+- [Crawling & URL Discovery Guide](docs/crawling-guide.md): Probing, URL normalization, depth limits, and robots.txt.
+- [Single Page Applications & Dynamic Sites](docs/spa-and-dynamic-sites.md): Pure Python data scraping and Playwright headless rendering.
+- [Output Modes & Formatting](docs/output-modes.md): Single-file Markdown, Directory Tree Markdown, and Offline HTML.
+- [Installation Guide](docs/installation.md): Installation options for PyPI, AUR, Makefile, and development environments.
+
 ## Architecture
 
 - **Python Crawler**: Manages concurrent network requests, retries, and depth tracking.
